@@ -28,6 +28,9 @@
 :size - [w, h]
 :bounds - [x, y, w, h]
 :location - [x y]
+
+:pack - shall the frame autopack at the end?
+:show - shall the frame autoshow at the end?
 "
     (let [default-opts 
 	  {}
@@ -71,20 +74,25 @@
 		     (conj (conj (conj (conj l f) s) '_) `(.add ~frame ~f)))
 		   '() (partition 2 bindings))))]
 	 (doto ~frame
-	   ~(when-let [on-close (*frame-on-close-actions* (:on-close opts))]
-	      `(.setDefaultCloseOperation ~on-close))
-	   ~(when-let [icon (:icon opts)]
-	      `(.setIconImage (.getImage (ImageIcon. icon))))
-	   ~(when-let [decorated (:decorated opts)]
-	      `(.setUndecorated (not decorated)))
-	   ~(when-let [dlfd (:look-and-feel-decorated opts)]
-	      `(.setDefaultLookAndFeelDecorated dlfd))
-	   ~(when-let [[w h] (:size opts)]
-	      `(.setSize w h))
-	   ~(when-let [[x y w h] (:bounds opts)]
-	      `(.setBounds x y w h))
-	   ~(when-let [[x y] (:location opts)]
-	      `(.setLocation x y))
-	   ~(if (contains? opts :centered)
-	      `(.setLocationRelativeTo (:centered opts)))
-	   ~@forms))))
+	   ~@(when-let [on-close (*frame-on-close-actions* (:on-close opts))]
+	      [`(.setDefaultCloseOperation ~on-close)])
+	   ~@(when-let [icon (:icon opts)]
+	      [`(.setIconImage (.getImage (ImageIcon. icon)))])
+	   ~@(when-let [decorated (:decorated opts)]
+	      [`(.setUndecorated (not decorated))])
+	   ~@(when-let [dlfd (:look-and-feel-decorated opts)]
+	      [`(.setDefaultLookAndFeelDecorated dlfd)])
+	   ~@(when-let [[w h] (:size opts)]
+	      [`(.setSize w h)])
+	   ~@(when-let [[x y w h] (:bounds opts)]
+	      [`(.setBounds x y w h)])
+	   ~@(when-let [[x y] (:location opts)]
+	      [`(.setLocation x y)])
+	   ~@(if (contains? opts :centered)
+	      [`(.setLocationRelativeTo (:centered opts))])
+
+	   ~@forms
+	   ~@(if (:pack opts)
+	      [`(.pack)])
+	   ~@(if (:show opts)
+	      [`(.setVisible true)])))))
