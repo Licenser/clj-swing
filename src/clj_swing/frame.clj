@@ -74,7 +74,7 @@
 	   ~(when-let [on-close (*frame-on-close-actions* (:on-close opts))]
 	      `(.setDefaultCloseOperation ~on-close))
 	   ~(when-let [icon (:icon opts)]
-	      `(.setIconImage (ImageIcon. icon)))
+	      `(.setIconImage (.getImage (ImageIcon. icon))))
 	   ~(when-let [decorated (:decorated opts)]
 	      `(.setUndecorated (not decorated)))
 	   ~(when-let [dlfd (:look-and-feel-decorated opts)]

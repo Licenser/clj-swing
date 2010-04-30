@@ -14,7 +14,7 @@
 	   (and icon (not alignment))
 	   (JLabel. caption (ImageIcon. icon))
 	   (and icon alignment)
-	   (JLabel. caption (ImageIcon. icon) (get a-map alignment (JLabel/LEFT)))
+	   (JLabel. caption (.getImage (ImageIcon. icon)) (get a-map alignment (JLabel/LEFT)))
 	   (and (not icon) alignment)
 	   (JLabel. caption (get a-map alignment (JLabel/LEFT)))
 	   :else
