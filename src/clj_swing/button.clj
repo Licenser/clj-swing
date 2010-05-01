@@ -6,11 +6,11 @@
 (def *button-icon-keys* 
      [:icon :disabled-icon :selected-icon :pressed-icon :disabled-selected-icon :rollover-icon :rollover-selected-icon ])
 (def *button-known-keys*
-     (concat [:action :caption] *button-icon-keys*))
+     (concat [:action :caption :name] *button-icon-keys*))
 
 
-(defmacro general-button [cl {caption :caption action :action :as opts}]
-  (let [b (gensym "btn")]
+(defmacro general-button [cl {caption :caption action :action name :name :as opts}]
+  (let [b (or name (gensym "btn"))]
     `(let [~b  (new ~cl)]
        (doto ~b
 	 ~@(if caption  
