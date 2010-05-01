@@ -1,5 +1,6 @@
 (ns clj-swing.frame
-  (:import (javax.swing JFrame ImageIcon)))
+  (:import (javax.swing JFrame ImageIcon))
+  (:require [clojure.contrib.java-utils :as java]))
 
 (defmacro set-constraint! [constraints field value]
   `(set! (. ~constraints ~(symbol (name field)))
@@ -92,6 +93,7 @@
 	      [`(.setLocationRelativeTo (:centered opts))])
 
 	   ~@forms
+
 	   ~@(if (:pack opts)
 	      [`(.pack)])
 	   ~@(if (:show opts)

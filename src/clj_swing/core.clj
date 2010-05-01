@@ -1,26 +1,29 @@
-(ns clj-swing.core)
+(ns clj-swing.core
+  (:import (java.awt.event ActionListener))
+  (:require [clojure.contrib.string :as st]))
 
-(import '(javax.swing JFrame JLabel JTextField JButton JComboBox JPanel Timer)
-	'(java.awt.event ActionListener)
-	'(java.awt GridBagLayout GridLayout GridBagConstraints))
+(defn kw-to-setter [kw]
+  (symbol (apply str "set" (map st/capitalize (st/split #"-" (name kw))))))
 
-(require '[clojure.contrib.java-utils :as java])
+(defn remove-known-keys [m ks]
+  (reduce dissoc m ks))
 
-(defmulti add 
-  "Adds to an object" 
-  [target objs]
-  type)
+(defn icon-setters [names opts]
+  (remove 
+   nil?
+   (map
+    (fn [name] 
+      (when-let [icon (opts name)] 
+	`(.  ~(kw-to-setter name) (.getImage (ImageIcon. ~icon))))) names)))
 
-(defmacro combo-box [[& items] & actions]
-  `(doto (JComboBox.)
-     ~@(map #(list '.addItem %) items)
-     ~@actions)))
-
-(defn selected-item [obj]
-  (.getSelectedItem obj))
-
-(defmacro set-text! [component text]
-  `(. ~component setText ~text))
+(defn auto-setters [cl known-kws opts]
+  (map (fn [[a v]] (list 
+		    '. 
+		    (kw-to-setter a) 
+		    (if (keyword? v)
+		      `(. ~cl ~(symbol (st/upper-case (name v))))
+		      v)))
+       (remove-known-keys opts known-kws)))
 
 (defmacro add-action-listener [obj [[event] & code]]
   `(doto ~obj
@@ -28,12 +31,27 @@
       (proxy [ActionListener] []
 	(actionPerformed [~event]
 			 ~@code)))))
+(comment
+(import '(javax.swing JFrame JLabel JTextField JButton JComboBox JPanel Timer)
+	'(java.awt.event ActionListener)
+	'(java.awt GridBagLayout GridLayout GridBagConstraints))
 
-(defmacro button [n caption listener & actions]
-  `(let [~n (JButton. ~caption)]
-     (add-action-listener ~n ~listener)
-     (doto ~n
-       ~@actions)))
+
+
+(defmacro set-text! [component text]
+  `(. ~component setText ~text))
+
+
+
+
+(defn selected-item [obj]
+  (.getSelectedItem obj))
+
+(defmacro combo-box [[& items] & actions]
+  `(doto (JComboBox.)
+     ~@(map #(list '.addItem %) items)
+     ~@actions))
 
 (defmacro panel [& args]
   `(JPanel. ~@args))
+)

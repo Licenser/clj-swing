@@ -35,6 +35,6 @@
 		  (.setVisible true)))
 
 
-(frame :title "Test Frame" :layout (java.awt.GridBagLayout.) :constrains (java.awt.GridBagConstraints.) [:gridx 0 :gridy 0 _ (label "0/0") :gridx 1 :gridy 1 (label "1/1")] (.setVisible true))
+(frame :title "Test Frame" :layout (java.awt.GridBagLayout.) :constrains (java.awt.GridBagConstraints.) [:gridx 0 :gridy 0 _ (label "0/0") :gridx 1 :gridy 1 _ (label "1/1")] (.setVisible true))
 
 (frame :title "Test Frame" :layout (java.awt.GridBagLayout.) :constrains (java.awt.GridBagConstraints.) [:gridx 0 :gridy 0 _ (label "0/0")] (.setVisible true))
