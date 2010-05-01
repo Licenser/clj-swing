@@ -1,5 +1,6 @@
 (ns clj-swing.core
-  (:import (java.awt.event ActionListener))
+  (:import (java.awt.event ActionListener)
+	   (javax.swing ImageIcon))
   (:require [clojure.contrib.string :as st]))
 
 (defn kw-to-setter [kw]
