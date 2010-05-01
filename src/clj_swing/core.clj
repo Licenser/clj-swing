@@ -6,8 +6,25 @@
 (defn kw-to-setter [kw]
   (symbol (apply str "set" (map st/capitalize (st/split #"-" (name kw))))))
 
+(defn group-container-args [args]
+  (reduce 
+   (fn [{options :options kw :kw state :state :as r} arg]
+     (cond
+      (= state :forms)
+      (update-in r [:forms] conj arg)
+      kw
+      (assoc r :options (assoc options kw arg) :kw nil)
+      (keyword? arg)
+      (assoc r :kw arg)
+      (vector? arg)
+      (assoc r :bindings arg :state :forms)))
+   {:options {} :kw nil :state :options :forms []} args))
+
 (defn remove-known-keys [m ks]
   (reduce dissoc m ks))
+
+(defn has-index? [seq idx]
+  (and (>= idx 0) (< idx (count seq))))
 
 (defn icon-setters [names opts]
   (if opts

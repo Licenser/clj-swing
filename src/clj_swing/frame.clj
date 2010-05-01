@@ -1,4 +1,5 @@
 (ns clj-swing.frame
+  (:use [clj-swing.core :only [group-container-args icon-setters auto-setters]])
   (:import (javax.swing JFrame ImageIcon))
   (:require [clojure.contrib.java-utils :as java]))
 
@@ -15,6 +16,10 @@
    :hide (JFrame/HIDE_ON_CLOSE)
    :dispose (JFrame/DISPOSE_ON_CLOSE)})
 
+
+(def *frame-known-keys*
+     [:name :icon :title :layout :constrains :on-close :size :bounds :location :pack :show :centered])
+
 (defmacro frame [& args]
   "options are:
 :name - internal name of the frame.
@@ -22,11 +27,8 @@
 :title - title for the frame.
 :layout - layout manager.
 :constrains - constrains object for the layout manager.
-:decorated - sets weather or not the frame shall be undecorated. Default: true
 :on-close - one of :do-nothing, :exit, :hide, :dispose, 
   sets the default on close action for the frame.
-:look-and-feel-decorated - shall the window gets it's decorations from the look and feel.
-
 :size - [w, h]
 :bounds - [x, y, w, h]
 :location - [x y]
@@ -34,21 +36,8 @@
 :pack - shall the frame autopack at the end?
 :show - shall the frame autoshow at the end?
 "
-    (let [default-opts 
-	  {}
-	  {forms :forms opts :options bindings :bindings} 
-	  (reduce 
-	   (fn [{options :options kw :kw state :state :as r} arg]
-	     (cond
-	      (= state :forms)
-	      (update-in r [:forms] conj arg)
-	      kw
-	      (assoc r :options (assoc options kw arg) :kw nil)
-	      (keyword? arg)
-	      (assoc r :kw arg)
-	      (vector? arg)
-	      (assoc r :bindings arg :state :forms)))
-	   {:options {} :kw nil :state :options :forms []} args)
+    (let [default-opts {}
+	  {forms :forms opts :options bindings :bindings} (group-container-args args)
 	  opts (merge default-opts opts)
 	  frame (or (:name opts) (gensym "frame"))
 	  constrains (gensym "constrains")
@@ -66,8 +55,7 @@
 		   (fn [l [f s]]
 		     (if (keyword? f)
 		       (conj (conj l '_) `(set-constraint! ~constrains ~f ~s))
-		       (conj (conj (conj (conj l f) s) '_) `(.add ~frame ~f ~constrains))
-		       ))
+		       (conj (conj (conj (conj l f) s) '_) `(.add ~frame ~f ~constrains))))
 		   '() (partition 2 bindings)))
 		 (reverse 
 		  (reduce
@@ -75,22 +63,18 @@
 		     (conj (conj (conj (conj l f) s) '_) `(.add ~frame ~f)))
 		   '() (partition 2 bindings))))]
 	 (doto ~frame
+	   ~@(icon-setters [:icon]  opts)
+	   ~@(auto-setters JFrame *frame-known-keys* opts)
 	   ~@(when-let [on-close (*frame-on-close-actions* (:on-close opts))]
 	      [`(.setDefaultCloseOperation ~on-close)])
-	   ~@(when-let [icon (:icon opts)]
-	      [`(.setIconImage (.getImage (ImageIcon. icon)))])
-	   ~@(when-let [decorated (:decorated opts)]
-	      [`(.setUndecorated (not decorated))])
-	   ~@(when-let [dlfd (:look-and-feel-decorated opts)]
-	      [`(.setDefaultLookAndFeelDecorated dlfd)])
 	   ~@(when-let [[w h] (:size opts)]
 	      [`(.setSize w h)])
 	   ~@(when-let [[x y w h] (:bounds opts)]
-	      [`(.setBounds x y w h)])
+	      [`(.setBounds ~x ~y ~w ~h)])
 	   ~@(when-let [[x y] (:location opts)]
-	      [`(.setLocation x y)])
+	      [`(.setLocation ~x ~y)])
 	   ~@(if (contains? opts :centered)
-	      [`(.setLocationRelativeTo (:centered opts))])
+	      [`(.setLocationRelativeTo ~(:centered opts))])
 
 	   ~@forms
 

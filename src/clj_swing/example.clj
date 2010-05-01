@@ -1,5 +1,5 @@
 (ns clj-swing.example
-  (:use [clj-swing frame label button combo-box list]))
+  (:use [clj-swing frame label button combo-box list panel]))
 
 (import '(javax.swing JFrame JLabel JTextField JButton JComboBox JPanel Timer)
 	'(java.awt.event ActionListener)
@@ -15,19 +15,14 @@
 		   _ (label "Algorithms")
 		   :gridy 1
 		   _ (label "Button")
-		   :gridx 0 :gridy 3 :gridwidth 2 :anchor :LINE_START
-		   canvas (label "-")
-		   :gridwidth 1
-		   :gridx 1 :gridy 0
+		   :gridx 1 :gridy 0 :anchor :LINE_START
 		   algorithm-chooser (combo-box [] :model (seq-ref-combobox-model sr))
 		   :gridy 1
 		   _ (button "Run Algorithm" 
 			     :action ([event]
-					(dosync (alter lm conj (selected-item algorithm-chooser)))
-					(.pack fr)))
-		   :gridx 3 :gridy 0 :gridheight 3
-		   output (jlist [] 
-				 :model (seq-ref-list-model lm))
+					(dosync (alter lm conj (selected-item algorithm-chooser)))))
+		   :gridx 3 :gridy 0 :gridheight 2 :anchor :CENTER
+		   _ (scroll-panel (jlist :model (seq-ref-list-model lm)) :preferred-size [150 100])
 ])
 )
 

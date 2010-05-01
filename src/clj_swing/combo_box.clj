@@ -61,7 +61,7 @@
 	   :set-selected-item ([i] (dosync (if (and i (some #(= i %) @seq-ref)) (swap! selected (constantly i)) (swap! selected (constantly nil)))))
 	   :add-listener ([l] (swap! listeners conj l))
 	   :remove-listener ([l] (swap! listeners disj l))
-	   :get ([i] (if (contains? @seq-ref i) (nth @seq-ref i) nil))
+	   :get ([i] (if (has-index? @seq-ref i) (nth @seq-ref i) nil))
 	   :add ([itm] (dosync (alter seq-ref conj itm)))
 	   :add-at ([itm idx] (dosync 
 			       (if (vector? @seq-ref)
