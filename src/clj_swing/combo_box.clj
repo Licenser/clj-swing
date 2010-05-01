@@ -94,3 +94,6 @@
 
 (defn selected-item [obj]
   (.getSelectedItem obj))
+
+
+;; TODO Add list cell renderer proxy stuff
