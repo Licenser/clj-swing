@@ -1,24 +1,32 @@
 (ns clj-swing.example
-  (:use [clj-swing core label]))
+  (:use [clj-swing core label button]))
 
+
+
+(import '(javax.swing JFrame JLabel JTextField JButton JComboBox JPanel Timer)
+	'(java.awt.event ActionListener)
+	'(java.awt GridBagLayout GridLayout GridBagConstraints))
 
 (defn draw-sort [c alg]
-  (set-text! c alg))
+  (.setText c alg))
+
+(def sr (ref '()))
 
 (defn grid-sort-app []
   (frame :title "Sort Visualizer" :layout (GridLayout. 2 2 2 2) 
-	      [algorithm-chooser (combo-box ["Quick sort" "Bubble Sort"])
-	       canvas (label "")
+	      [algorithm-chooser (combo-box [] :model (seq-ref-combobox-model sr))
+	       output (label "")
 	       l1 (label "Algorithms")
 	       l2 (label "Button")
-	       button (button b "Run Algorithm"
-			      ([event] 
-				 (draw-sort canvas (selected-item algorithm-chooser))))]
+	       button (button "Run Algorithm"
+			      :action ([event] 
+				 (.setText output (selected-item algorithm-chooser))))]
 	      (.setSize 250 250)
-	      (.setVisible true)))
+	      (.setVisible true))
+)
 
 (defn grid-bag-sort-app []
-  (frame "Sort Visualizer" (GridBagLayout.) (java.awt.GridBagConstraints.)
+  (frame :title "Sort Visualizer" :layout (GridBagLayout.) :constrains (java.awt.GridBagConstraints.)
 		  [:gridx 0 :gridy 0 :anchor :LINE_END
 		   _ (label "Algorithms")
 		   :gridy 1
@@ -28,9 +36,9 @@
 		   :gridx 1 :gridy 0 :anchor :LINE_START
 		   algorithm-chooser (combo-box ["Quick sort" "Bubble Sort"])
 		   :gridy 1
-		   _ (button b "Run Algorithm" 
-				  ([event]
-				     (draw-sort canvas (selected-item algorithm-chooser))))]
+		   _ (button "Run Algorithm" 
+			     :action ([event]
+					(draw-sort canvas (selected-item algorithm-chooser))))]
 		  (.setSize 300 300)
 		  (.setVisible true)))
 
