@@ -10,7 +10,7 @@
 (defn draw-sort [c alg]
   (.setText c alg))
 
-(def sr (ref '()))
+(def sr (ref '("Quick sort" "Bubble Sort")))
 
 (defn grid-sort-app []
   (frame :title "Sort Visualizer" :layout (GridLayout. 2 2 2 2) 
@@ -27,6 +27,7 @@
 
 (defn grid-bag-sort-app []
   (frame :title "Sort Visualizer" :layout (GridBagLayout.) :constrains (java.awt.GridBagConstraints.)
+	 :show true :pack true
 		  [:gridx 0 :gridy 0 :anchor :LINE_END
 		   _ (label "Algorithms")
 		   :gridy 1
@@ -34,13 +35,12 @@
 		   :gridy 2
 		   canvas (label "")
 		   :gridx 1 :gridy 0 :anchor :LINE_START
-		   algorithm-chooser (combo-box ["Quick sort" "Bubble Sort"])
+		   algorithm-chooser (combo-box [] :model (seq-ref-combobox-model sr))
 		   :gridy 1
 		   _ (button "Run Algorithm" 
 			     :action ([event]
-					(draw-sort canvas (selected-item algorithm-chooser))))]
-		  (.setSize 300 300)
-		  (.setVisible true)))
+					(.setText canvas (selected-item algorithm-chooser))))])
+)
 
 
 (frame :title "Test Frame" :layout (java.awt.GridBagLayout.) :constrains (java.awt.GridBagConstraints.) [:gridx 0 :gridy 0 _ (label "0/0") :gridx 1 :gridy 1 _ (label "1/1")] (.setVisible true))
