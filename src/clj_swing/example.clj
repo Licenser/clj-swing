@@ -1,48 +1,38 @@
 (ns clj-swing.example
-  (:use [clj-swing frame label button combo-box]))
-
-
+  (:use [clj-swing frame label button combo-box list]))
 
 (import '(javax.swing JFrame JLabel JTextField JButton JComboBox JPanel Timer)
 	'(java.awt.event ActionListener)
 	'(java.awt GridBagLayout GridLayout GridBagConstraints))
 
-(defn draw-sort [c alg]
-  (.setText c alg))
-
-(def sr (ref '("Quick sort" "Bubble Sort")))
-
-(defn grid-sort-app []
-  (frame :title "Sort Visualizer" :layout (GridLayout. 2 2 2 2) 
-	      [algorithm-chooser (combo-box [] :model (seq-ref-combobox-model sr))
-	       output (label "")
-	       l1 (label "Algorithms")
-	       l2 (label "Button")
-	       button (button "Run Algorithm"
-			      :action ([event] 
-				 (.setText output (selected-item algorithm-chooser))))]
-	      (.setSize 250 250)
-	      (.setVisible true))
-)
+(def sr (ref '["Quick sort" "Bubble Sort"]))
+(def lm (ref '["Bla" "Blubb"]))
 
 (defn grid-bag-sort-app []
-  (frame :title "Sort Visualizer" :layout (GridBagLayout.) :constrains (java.awt.GridBagConstraints.)
+  (frame :title "Sort Visualizer" :layout (GridBagLayout.) :constrains (java.awt.GridBagConstraints.) :name fr
 	 :show true :pack true
 		  [:gridx 0 :gridy 0 :anchor :LINE_END
 		   _ (label "Algorithms")
 		   :gridy 1
 		   _ (label "Button")
-		   :gridy 2
-		   canvas (label "")
-		   :gridx 1 :gridy 0 :anchor :LINE_START
+		   :gridx 0 :gridy 3 :gridwidth 2 :anchor :LINE_START
+		   canvas (label "-")
+		   :gridwidth 1
+		   :gridx 1 :gridy 0
 		   algorithm-chooser (combo-box [] :model (seq-ref-combobox-model sr))
 		   :gridy 1
 		   _ (button "Run Algorithm" 
 			     :action ([event]
-					(.setText canvas (selected-item algorithm-chooser))))])
+					(dosync (alter lm conj (selected-item algorithm-chooser)))
+					(.pack fr)))
+		   :gridx 3 :gridy 0 :gridheight 3
+		   output (jlist [] 
+				 :model (seq-ref-list-model lm))
+])
 )
 
 
+(comment
 (frame :title "Test Frame" :layout (java.awt.GridBagLayout.) :constrains (java.awt.GridBagConstraints.) [:gridx 0 :gridy 0 _ (label "0/0") :gridx 1 :gridy 1 _ (label "1/1")] (.setVisible true))
 
-(frame :title "Test Frame" :layout (java.awt.GridBagLayout.) :constrains (java.awt.GridBagConstraints.) [:gridx 0 :gridy 0 _ (label "0/0")] (.setVisible true))
+(frame :title "Test Frame" :layout (java.awt.GridBagLayout.) :constrains (java.awt.GridBagConstraints.) [:gridx 0 :gridy 0 _ (label "0/0")] (.setVisible true)))

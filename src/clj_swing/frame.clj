@@ -53,7 +53,6 @@
 	  frame (or (:name opts) (gensym "frame"))
 	  constrains (gensym "constrains")
 	  manager (gensym "manager")]
-      (prn opts)
       `(let [~frame  ~(if (:title opts)
 			`(JFrame. ~(:title opts))
 			`(JFrame.))

@@ -40,8 +40,3 @@
       (proxy [ActionListener] []
 	(actionPerformed [~event]
 			 ~@code)))))
-(comment
-
-(defmacro panel [& args]
-  `(JPanel. ~@args))
-)
