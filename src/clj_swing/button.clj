@@ -1,6 +1,6 @@
 (ns clj-swing.button
   (:use [clj-swing.core :only [add-action-listener icon-setters auto-setters]])
-  (:import (javax.swing JButton JCheckBox ImageIcon JCheckBoxMenuItem JRadioButton JRadioButtonMenuItem JToggleButton ButtonGroup)))
+  (:import (javax.swing JButton JCheckBox JCheckBoxMenuItem JRadioButton JRadioButtonMenuItem JToggleButton ButtonGroup)))
 
 
 (def *button-icon-keys* 
