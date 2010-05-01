@@ -1,5 +1,5 @@
 (ns clj-swing.example
-  (:use [clj-swing core label button]))
+  (:use [clj-swing frame label button combo-box]))
 
 
 
