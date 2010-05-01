@@ -7,6 +7,6 @@
   `(let [l# (JLabel. ~caption)]
      (doto l#
        ~@(if obj 
-	 [`(.setLabelFor ~obj)])
+	   [`(.setLabelFor ~obj)])
        ~@(icon-setters [:icon :disabled-icon]  opts)
        ~@(auto-setters JLabel [:for] opts))))
