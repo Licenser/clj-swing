@@ -1,6 +1,9 @@
 (ns clj-swing.document
   (:require [clojure.contrib.string :as st])
-  (:import [javax.swing.text AbstractDocument Position]
+  (:import [javax.swing.text AbstractDocument Position Element PlainDocument]
+	   javax.swing.event.DocumentEvent
+	   javax.swing.event.DocumentEvent$EventType
+	   javax.swing.event.DocumentEvent$ElementChange
 	   javax.swing.text.AbstractDocument$Content))
 
 (defn- update-positions [positions offset change]
@@ -28,11 +31,11 @@
 			(proxy [Position] []
 			  (getOffset [] @p))))
 
-      (getChars [where len  txt] 
-		(set! (.array txt ) (into-array (subs  @str-ref where len))))
+      (getChars [where len txt] 
+		(set! (.array txt) (into-array Character/TYPE (seq (subs  @str-ref (max 0 where) (max 0 (min len (.length @str-ref))))))))
 
       (getString [where len]
-		(subs @str-ref where len))  
+		 (subs @str-ref  (max 0 where) (max 0 (min len (.length @str-ref)))))  
 
       (length []
 	     (.length @str-ref))
@@ -49,5 +52,36 @@
 	       (alter str-ref str-remove where nitems))
 	      nil))))
 
-(defn abstract-str-ref-document [str-ref]
-  (javax.swing.text.AbstractDocument. #^AbstractDocument$Content (string-ref-content str-ref))) 
+
+(defn plain-str-ref-document [str-ref]
+  (PlainDocument. (string-ref-content str-ref)))
+
+(comment defn abstract-str-ref-document [str-ref]
+  (let [d (proxy [AbstractDocument]  [(string-ref-content str-ref)])]
+    (add-watch str-ref (gensym "abstract-str-ref-document-watch")
+	       (fn [_ _ _ state]
+		 (.fireChangedUpdate d (proxy [DocumentEvent] []
+					 (getChange [elem] (proxy [DocumentEvent$ElementChange] []
+							     (getChildrenAdded [] (into-array Element[]))
+							     (getChildrenRemoved [] (into-array Element[]))
+							     (getElement[] elem) 
+							     (getIndex[] 0)))
+						    
+
+					 (getDocument [] d)
+					 (getLength [] (.length state))
+					 (getOffset [] 0)
+					 (getType [] (DocumentEvent$EventType/CHANGE))))))
+    (.fireChangedUpdate d (proxy [DocumentEvent] []
+			    (getChange [elem] (proxy [DocumentEvent$ElementChange] []
+						(getChildrenAdded [] (into-array Element[]))
+						(getChildrenRemoved [] (into-array Element[]))
+						(getElement[] elem) 
+						(getIndex[] 0)))
+			    
+			    
+			    (getDocument [] d)
+			    (getLength [] (.length state))
+			    (getOffset [] 0)
+			    (getType [] (DocumentEvent$EventType/CHANGE))))
+    d))

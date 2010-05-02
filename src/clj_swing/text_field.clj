@@ -3,11 +3,12 @@
   (:import (javax.swing JTextField ListModel)
 	   (javax.swing.event ListDataEvent ListDataListener ListSelectionListener)))
 
-(defmacro text-field [[& items] & {action :action :as opts}]
+(def *text-field-known-keys* [:action])
+
+(defmacro text-field [& {action :action :as opts}]
   `(doto (JTextField.)
      ~@(if action  
 	 [`(add-action-listener ~action)])
-     ~@(auto-setters JComboBox *cb-known-keys* opts)
-     ~@(map #(list '.addItem %) items)))
+     ~@(auto-setters JTextField *text-field-known-keys* opts)))
 
 
