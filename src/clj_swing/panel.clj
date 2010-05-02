@@ -7,13 +7,12 @@
 
 
 (def *panel-known-keys*
-     [:name :icon :title :layout :constrains :size :bounds :location :pack :preferred-size])
+     [:name :icon :title :layout :constrains :size :bounds :location :pack :preferred-size :paint])
 
 
 (defmacro general-panel [cl args]
   "options are:
 :name - internal name of the frame.
-:title - title for the frame.
 :layout - layout manager.
 :constrains - constrains object for the layout manager.
 :on-close - one of :do-nothing, :exit, :hide, :dispose, 
@@ -21,18 +20,20 @@
 :preferred-size - [w, h]
 :bounds - [x, y, w, h]
 :location - [x y]
-
+:paint - paint function
 :pack - shall the frame autopack at the end?
 :show - shall the frame autoshow at the end?
 "
     (let [default-opts {}
-	  {forms :forms opts :options bindings :bindings} (group-container-args args)
+	  {forms :forms {[[paint-obj] & paint-code] :paint :as opts} :options bindings :bindings} (group-container-args args)
 	  opts (merge default-opts opts)
 	  panel (or (:name opts) (gensym "panel"))
 	  constrains (gensym "constrains")
 	  manager (gensym "manager")]
-      `(let [~panel  ~(if (:title opts)
-			`(new ~cl ~(:title opts))
+      `(let [~panel  ~(if (:paint opts)
+			`(proxy [~cl] []
+			  (paintComponent [~paint-obj] 
+					  ~@paint-code))
 			`(new ~cl))
 	     ~@(if (:layout opts)
 		 ['_ `(.setLayout ~panel ~(:layout opts))])

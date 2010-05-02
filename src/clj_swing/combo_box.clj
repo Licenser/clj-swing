@@ -50,8 +50,8 @@
 	`(removeElementAt [~remove-idx] 
 		     ~@remove-at-code)])))
 
-(defn seq-ref-combobox-model [seq-ref]
-  (let [selected (atom nil)
+(defn seq-ref-combobox-model [seq-ref & [selected]]
+  (let [selected (or selected (atom nil))
 	listeners (atom #{})
 	key (gensym "seq-ref-combobox-model-watch")
 	m (commbo-box-model

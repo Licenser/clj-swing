@@ -1,5 +1,5 @@
 (ns clj-swing.list
-  (:use [clj-swing.core])
+  (:use [clj-swing core panel])
   (:import (javax.swing JList ListModel)
 	   (javax.swing.event ListDataEvent ListDataListener ListSelectionListener)))
 
@@ -16,13 +16,8 @@
 (defmacro list-model [& {[[] & size-code] :size
 			 [[get-idx] & get-code] :get
 			 [[a-l-l] & add-listener-code] :add-listener
-			 [[r-l-l] & remove-listener-code] :remove-listener
-			 
-
-}]
+			 [[r-l-l] & remove-listener-code] :remove-listener}]
   `(proxy [ListModel] []
-
-;; Code for List model
      (getSize []
 	      ~@size-code)
      (getElementAt [~get-idx]
@@ -30,7 +25,7 @@
      (addListDataListener [~a-l-l]
 			  ~@add-listener-code)
      (removeListDataListener [~r-l-l]
-			  ~@remove-listener-code)))
+			     ~@remove-listener-code)))
 
 
 (defn seq-ref-list-model [seq-ref]
@@ -48,16 +43,19 @@
 		   (doseq [l @listeners]
 		     (.contentsChanged l m)))))
     m))
-    
-(defmacro jlist [& {action :action on-selection-change :on-selection-change items :items :as opts}]
-  `(let [l# (doto (JList.)
+
+(defmacro jlist [& {action :action on-selection-change :on-selection-change items :items scrolling :scrolling :as opts}]
+  (let [l (gensym "jlist")]
+  `(let [~l (doto (JList.)
 	      ~@(if action  
 		  [`(add-action-listener ~action)])
 	      ~@(if on-selection-change  
 		  [`(add-list-selection-listener ~on-selection-change)])    
 	      ~@(auto-setters JList *list-known-keys* opts)
 	      ~@(map #(list '.addItem %) items))]
-   
-     l#))
+     
+     ~@(if scrolling 
+	`[(scroll-panel ~l)]
+	`[~l]))))
 
 ;; TODO Add list cell renderer proxy stuff
