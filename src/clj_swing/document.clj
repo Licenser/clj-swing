@@ -31,11 +31,18 @@
 			(proxy [Position] []
 			  (getOffset [] @p))))
 
-      (getChars [where len txt] 
-		(set! (.array txt) (into-array Character/TYPE (seq (subs  @str-ref (max 0 where) (max 0 (min len (.length @str-ref))))))))
+      (getChars [where len txt]
+		(let [s (max 0 (min where len))
+		      e (max 0 (min where len (.length @str-ref)))]
+		  (println "A:" @str-ref where len)
+		  (set! (. txt array) (into-array Character/TYPE (seq (subs @str-ref s e))))
+		  (println "B")
+		  (prn (seq (. txt array)))))
 
       (getString [where len]
-		 (subs @str-ref  (max 0 where) (max 0 (min len (.length @str-ref)))))  
+		 (let [s (max 0 (min where len))
+		      e (max 0 (min where len (.length @str-ref)))]
+		   (subs @str-ref s e)))
 
       (length []
 	     (.length @str-ref))
