@@ -1,5 +1,6 @@
 (ns clj-swing.frame
-  (:use [clj-swing.core :only [group-container-args icon-setters auto-setters]])
+  (:use [clj-swing.core :only [group-container-args icon-setters auto-setters]]
+	[clojure.contrib.swing-utils :only [do-swing]])
   (:import (javax.swing JFrame ImageIcon))
   (:require [clojure.contrib.java-utils :as java]))
 
@@ -42,43 +43,44 @@
 	  frame (or (:name opts) (gensym "frame"))
 	  constrains (gensym "constrains")
 	  manager (gensym "manager")]
-      `(let [~frame  ~(if (:title opts)
-			`(JFrame. ~(:title opts))
-			`(JFrame.))
-	     ~@(if (:layout opts)
-		 ['_ `(.setLayout ~frame ~(:layout opts))])
-	     ~@(if (:constrains opts)
-		 `(~constrains ~(:constrains opts)))
-	     ~@(if (:constrains opts)
-		 (reverse 
-		  (reduce
-		   (fn [l [f s]]
-		     (if (keyword? f)
-		       (conj (conj l '_) `(set-constraint! ~constrains ~f ~s))
-		       (conj (conj (conj (conj l f) s) '_) `(.add ~frame ~f ~constrains))))
-		   '() (partition 2 bindings)))
-		 (reverse 
-		  (reduce
-		   (fn [l [f s]]
-		     (conj (conj (conj (conj l f) s) '_) `(.add ~frame ~f)))
-		   '() (partition 2 bindings))))]
-	 (doto ~frame
-	   ~@(icon-setters [:icon]  opts)
-	   ~@(auto-setters JFrame *frame-known-keys* opts)
-	   ~@(when-let [on-close (*frame-on-close-actions* (:on-close opts))]
-	      [`(.setDefaultCloseOperation ~on-close)])
-	   ~@(when-let [[w h] (:size opts)]
-	      [`(.setSize w h)])
-	   ~@(when-let [[x y w h] (:bounds opts)]
-	      [`(.setBounds ~x ~y ~w ~h)])
-	   ~@(when-let [[x y] (:location opts)]
-	      [`(.setLocation ~x ~y)])
-	   ~@(if (contains? opts :centered)
-	      [`(.setLocationRelativeTo ~(:centered opts))])
-
-	   ~@forms
-
-	   ~@(if (:pack opts)
-	      [`(.pack)])
-	   ~@(if (:show opts)
-	      [`(.setVisible true)])))))
+      `(do-swing 
+	(let [~frame  ~(if (:title opts)
+			 `(JFrame. ~(:title opts))
+			 `(JFrame.))
+	      ~@(if (:layout opts)
+		  ['_ `(.setLayout ~frame ~(:layout opts))])
+	      ~@(if (:constrains opts)
+		  `(~constrains ~(:constrains opts)))
+	      ~@(if (:constrains opts)
+		  (reverse 
+		   (reduce
+		    (fn [l [f s]]
+		      (if (keyword? f)
+			(conj (conj l '_) `(set-constraint! ~constrains ~f ~s))
+			(conj (conj (conj (conj l f) s) '_) `(.add ~frame ~f ~constrains))))
+		    '() (partition 2 bindings)))
+		  (reverse 
+		   (reduce
+		    (fn [l [f s]]
+		      (conj (conj (conj (conj l f) s) '_) `(.add ~frame ~f)))
+		    '() (partition 2 bindings))))]
+	  (doto ~frame
+	    ~@(icon-setters [:icon]  opts)
+	    ~@(auto-setters JFrame *frame-known-keys* opts)
+	    ~@(when-let [on-close (*frame-on-close-actions* (:on-close opts))]
+		[`(.setDefaultCloseOperation ~on-close)])
+	    ~@(when-let [[w h] (:size opts)]
+		[`(.setSize w h)])
+	    ~@(when-let [[x y w h] (:bounds opts)]
+		[`(.setBounds ~x ~y ~w ~h)])
+	    ~@(when-let [[x y] (:location opts)]
+		[`(.setLocation ~x ~y)])
+	    ~@(if (contains? opts :centered)
+		[`(.setLocationRelativeTo ~(:centered opts))])
+	    
+	    ~@forms
+	    
+	    ~@(if (:pack opts)
+		[`(.pack)])
+	    ~@(if (:show opts)
+		[`(.setVisible true)]))))))

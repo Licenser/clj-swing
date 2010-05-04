@@ -1,5 +1,7 @@
 (ns clj-swing.list
-  (:use [clj-swing core panel])
+  (:use [clj-swing core panel]
+	[clojure.contrib.swing-utils :only [do-swing]])
+
   (:import (javax.swing JList ListModel)
 	   (javax.swing.event ListDataEvent ListDataListener ListSelectionListener)))
 
@@ -39,9 +41,10 @@
 	   )]
     (add-watch seq-ref key 
 	       (fn [_ _ _ state]
-		 (let [m (ListDataEvent. m (ListDataEvent/CONTENTS_CHANGED) 0 (count state))]
-		   (doseq [l @listeners]
-		     (.contentsChanged l m)))))
+		 (do-swing
+		  (let [m (ListDataEvent. m (ListDataEvent/CONTENTS_CHANGED) 0 (count state))]
+		    (doseq [l @listeners]
+		      (.contentsChanged l m))))))
     m))
 
 (defmacro jlist [& {action :action on-selection-change :on-selection-change items :items scrolling :scrolling :as opts}]

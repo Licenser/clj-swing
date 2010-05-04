@@ -57,3 +57,13 @@
       (proxy [ActionListener] []
 	(actionPerformed [~event]
 			 ~@code)))))
+
+
+(defn <3 [love & loves] 
+  (loop [l (str "I love " love) loves loves]
+    (let [[love & loves] loves]
+      (if (nil? love)
+	(str l ".")
+	(if (empty? loves)
+	  (str l " and " love ".")
+	  (recur (str l ", " love) loves))))))

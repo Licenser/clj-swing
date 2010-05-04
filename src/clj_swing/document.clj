@@ -1,7 +1,8 @@
 (ns clj-swing.document
+  (:use [clojure.contrib.swing-utils :only [do-swing]])
   (:require [clojure.contrib.string :as st])
   (:import [javax.swing.text AbstractDocument Position Element PlainDocument]
-	   javax.swing.event.DocumentEvent
+	   [javax.swing.event DocumentEvent DocumentListener]
 	   javax.swing.event.DocumentEvent$EventType
 	   javax.swing.event.DocumentEvent$ElementChange
 	   javax.swing.text.AbstractDocument$Content))
@@ -25,7 +26,7 @@
 (defn string-ref-content [str-ref]
   (let [positions (atom [])]
     (proxy [AbstractDocument$Content] []
-      (createPosition [offset] 
+      (createPosition [offset]
 		      (let [p (atom offset)]
 			(swap! positions conj p)
 			(proxy [Position] []
@@ -92,3 +93,31 @@
 			    (getOffset [] 0)
 			    (getType [] (DocumentEvent$EventType/CHANGE))))
     d))
+
+(defn add-str-ref-doc-listener [doc-owner str-ref]
+  (let [doc (.getDocument doc-owner)
+	watch-key (gensym "str-ref-doc-listener-watch")
+	watch-fn (fn [l]
+		   (fn [a b c state]
+		     (do-swing
+		      (.removeDocumentListener doc l)
+		      (.remove doc 0 (.getLength doc))
+		      (.insertString doc 0 state nil)
+		      (.addDocumentListener doc l))))
+	l (proxy [DocumentListener] []
+	    (insertUpdate [event]
+			  (let [offset (.getOffset event)]
+			     (remove-watch str-ref watch-key)
+			     (dosync (alter str-ref str-insert offset (.getText doc offset (.getLength event))))
+			     (add-watch str-ref watch-key (watch-fn this))))
+	    (removeUpdate [event]
+			   (remove-watch  str-ref watch-key)
+			   (dosync (alter str-ref str-remove (.getOffset event) (.getLength event)))
+			   (add-watch str-ref watch-key (watch-fn this)))
+	    (changedUpdate [event]))]
+    (if (< 0 (.getLength doc))
+      (.remove doc 0 (.getOffset (.getEndPosition doc))))
+    (prn str-ref)
+    (.insertString doc 0 @str-ref nil)
+    (.addDocumentListener doc l)
+    (add-watch str-ref watch-key (watch-fn l))))

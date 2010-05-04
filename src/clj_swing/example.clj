@@ -8,7 +8,7 @@
 
 (def sr (ref '["Quick sort" "Bubble Sort"]))
 (def lm (ref '["Bla" "Blubb"]))
-(def str-ref (ref ""))
+(def str-ref (ref "A String!"))
 
 (def selected (atom nil))
 (def nativeLF (. UIManager getSystemLookAndFeelClassName))
@@ -52,6 +52,6 @@
 		   _ (button "Run Algorithm" 
 			     :action ([_] (if @selected (dosync (alter lm conj @selected)))))
 		   :gridx 0 :gridy 2 :gridwidth 2 :anchor :LINE_START
-		   _ (text-field :document (plain-str-ref-document str-ref) :columns 10)
+		   _ (text-field :str-ref str-ref :columns 10)
 		   :gridx 3 :gridy 0 :gridheight 3 :anchor :CENTER
 		   _ (scroll-panel (jlist :model (seq-ref-list-model lm)) :preferred-size [150 100])]))

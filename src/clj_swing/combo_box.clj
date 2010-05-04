@@ -1,5 +1,6 @@
 (ns clj-swing.combo-box
-  (:use [clj-swing.core])
+  (:use [clj-swing.core]
+	[clojure.contrib.swing-utils :only [do-swing]])
   (:import (javax.swing JComboBox ComboBoxModel MutableComboBoxModel)
 	   (javax.swing.event ListDataEvent ListDataListener)))
 
@@ -77,9 +78,10 @@
 				 (alter seq-ref drop-nth idx)))))]
     (add-watch seq-ref key 
 		    (fn [_ _ _ state]
-		      (let [m (ListDataEvent. m (ListDataEvent/CONTENTS_CHANGED) 0 (count state))]
+		      (do-swing
+		       (let [m (ListDataEvent. m (ListDataEvent/CONTENTS_CHANGED) 0 (count state))]
 			(doseq [l @listeners]
-			  (.contentsChanged l m)))))
+			  (.contentsChanged l m))))))
     m))
     
      
