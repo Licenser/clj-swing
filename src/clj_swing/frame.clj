@@ -70,7 +70,7 @@
 	    ~@(when-let [on-close (*frame-on-close-actions* (:on-close opts))]
 		[`(.setDefaultCloseOperation ~on-close)])
 	    ~@(when-let [[w h] (:size opts)]
-		[`(.setSize w h)])
+		[`(.setSize ~w ~h)])
 	    ~@(when-let [[x y w h] (:bounds opts)]
 		[`(.setBounds ~x ~y ~w ~h)])
 	    ~@(when-let [[x y] (:location opts)]

@@ -1,7 +1,10 @@
 (ns clj-swing.core
   (:import (java.awt.event ActionListener)
-	   (javax.swing ImageIcon))
-  (:require [clojure.contrib.string :as st]))
+	   (javax.swing ImageIcon)))
+
+(try
+  (require '[clojure.contrib.string :as st])
+   (catch Exception e (require '[clojure.contrib.str-utils2 :as st])))
 
 (defn kw-to-setter [kw]
   (symbol (apply str "set" (map st/capitalize (st/split #"-" (name kw))))))

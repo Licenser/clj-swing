@@ -1,7 +1,7 @@
 (ns clj-swing.panel
   (:use [clj-swing.core :only [group-container-args auto-setters icon-setters]])
 
-  (:import (javax.swing JPanel JScrollPane)
+  (:import (javax.swing JPanel JScrollPane JSplitPane)
 	   (java.awt Dimension))
   (:require [clojure.contrib.java-utils :as java]))
 
@@ -65,6 +65,15 @@
 
 (defmacro panel [& args]
   `(general-panel JPanel ~args))
+
+(defmacro split-horizontal [left right]
+  `(JSplitPane. JSplitPane/HORIZONTAL_SPLIT
+	       ~left ~right))
+
+(defmacro split-vertical [top bottom]
+  `(JSplitPane. JSplitPane/VERTICAL_SPLIT
+	       ~top ~bottom))
+
 
 (defmacro scroll-panel [obj & { :as opts}]
   `(doto (new JScrollPane ~obj)
