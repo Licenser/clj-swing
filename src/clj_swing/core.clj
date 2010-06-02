@@ -1,4 +1,5 @@
 (ns clj-swing.core
+  (:use [clojure.contrib.swing-utils :only [do-swing]])
   (:import (java.awt.event ActionListener)
 	   (javax.swing ImageIcon)))
 
@@ -59,9 +60,8 @@
      (.addActionListener
       (proxy [ActionListener] []
 	(actionPerformed [~event]
-			 ~@code)))))
-
-
+			 (do-swing 
+			 ~@code))))))
 (defn <3 [love & loves] 
   (loop [l (str "I love " love) loves loves]
     (let [[love & loves] loves]

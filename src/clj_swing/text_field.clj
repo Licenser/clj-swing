@@ -11,7 +11,6 @@
 	 [`(add-action-listener ~action)])
      ~@(if str-ref  
 	 [`(add-str-ref-doc-listener ~str-ref)])
-
      ~@(auto-setters JTextField *text-field-known-keys* opts)))
 
 
