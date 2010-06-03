@@ -1,5 +1,5 @@
 (ns clj-swing.example
-  (:use [clj-swing frame label button combo-box list panel document text-field]))
+  (:use [clj-swing  core frame label button combo-box list panel document text-field tree]))
 
 (import '(javax.swing  UIManager)
 	'(java.awt BasicStroke Color Dimension Graphics Graphics2D RenderingHints)
@@ -55,3 +55,32 @@
 		   _ (text-field :str-ref str-ref :columns 10)
 		   :gridx 3 :gridy 0 :gridheight 3 :anchor :CENTER
 		   _ (scroll-panel (jlist :model (seq-ref-list-model lm)) :preferred-size [150 100])]))
+
+(defn tree-example []
+  (let [sr (ref "")
+	m (ref {"Cookies" {"Chocolat" 1 "Vanilla" { "with sparkles" 2 "without sparkles" 3}}})
+	path (atom nil)]
+  (frame :title "Tree example" :show true :size [400 200]
+	 [_ (stack
+	     [tf (text-field :str-ref sr)
+	      _ (tree
+		 :name tr
+		 :action ([old new]
+			    (prn (.getSelectionPath tr))
+			    (if new
+			      (dosync
+			       (swap! path (constantly new))
+			       (alter sr (constantly (last new))))))
+		 :model (mapref-tree-model m "Food"))]
+	     (add-action-listener
+	      tf
+	      ([_]
+		 (dosync
+		  (let [c (get-in @m @path)]
+		    (if-let [r (butlast @path)]		    
+		      (do
+			(alter m update-in r #(dissoc % (last @path)))
+			(alter m update-in r #(assoc % @sr (last @path))))
+		      (do
+			(alter m dissoc (last @path))
+			(alter m assoc  @sr c))))))))])))

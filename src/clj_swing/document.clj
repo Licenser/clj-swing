@@ -1,14 +1,11 @@
 (ns clj-swing.document
   (:use [clojure.contrib.swing-utils :only [do-swing]])
+  (:require [clojure.contrib.string :as st])
   (:import [javax.swing.text AbstractDocument Position Element PlainDocument]
 	   [javax.swing.event DocumentEvent DocumentListener]
 	   javax.swing.event.DocumentEvent$EventType
 	   javax.swing.event.DocumentEvent$ElementChange
 	   javax.swing.text.AbstractDocument$Content))
-
-(try
-  (require '[clojure.contrib.string :as st])
-   (catch Exception e (require '[clojure.contrib.str-utils2 :as st])))
 
 
 (defn- update-positions [positions offset change]

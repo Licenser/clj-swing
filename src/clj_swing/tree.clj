@@ -6,7 +6,7 @@
 	   (javax.swing.event TreeSelectionListener TreeSelectionEvent TreeModelEvent)
            (javax.swing.tree TreePath TreeModel)))
 
-(def *tree-known-keys* [:action])
+(def *tree-known-keys* [:action :name])
 
 (defn- index-of [coll item]
   (loop [coll coll idx  (int 0)]
@@ -41,13 +41,14 @@
 	
 
 (defn mapref-tree-model 
-  [map-ref root-name &
+  [map-ref root-node &
    {node-wrapper :node-wrapper leaf? :leaf?
     :or {node-wrapper (fn [node path] (Pathed. node (str node) path))
 	 leaf? (fn [node map-ref] 
 		  (not (map? (get-in @map-ref (path node)))))}}]
   (let [listeners (atom [])
-	p
+	root (node-wrapper root-node [])
+	model
 	(proxy [TreeModel] []
 	  (addTreeModelListener [l] (swap! listeners conj l))
 	  (getChild [node idx]
@@ -62,7 +63,7 @@
 				 ks (keys (get-in @map-ref (path node)))]
 			     (index-of ks c)))
 	  (getRoot [] 
-		   (node-wrapper root-name []))
+		   root)
 	  (isLeaf [node]
 		  (leaf? node map-ref))
 	  (removeTreeModelListener [l] (swap! listeners #(remove (partial = l) %)))
@@ -73,26 +74,34 @@
     (add-watch map-ref (gensym)
 	       (fn [k r o n]
 		 (let [c (changed-path o n)
-		       e (TreeModelEvent. p (TreePath. (node-wrapper(get-in @map-ref c) c)))]
+		       p (loop [ps [] c c]
+			   (if (empty? c)
+			     (reverse (conj ps root))
+			     (recur (conj ps (node-wrapper (last c) (vec c))) (butlast c))))
+		       _ (prn 1 p (map path p))
+		       tp (TreePath. (to-array p))
+		       _ (prn 2 tp)
+		       e (TreeModelEvent. model tp)]
 		   (doseq [l @listeners]
+		     (prn l)
 		     (.treeStructureChanged l e)))))
-	       
-    p))
+    model))
 
-(defmacro tree [& data]
-  (let [{[[old-path new-path] & code] :action :as opts} (apply hash-map data)]
-  `(scroll-panel 
-    (doto (JTree.)
-      ~@(if code
-	  [`(.addTreeSelectionListener
-	     (proxy [TreeSelectionListener] []
-	       (valueChanged [e#]
-			     (do-swing
-			     (let [~new-path (if-let [p# (.getNewLeadSelectionPath e#)]
-					       (path (.getLastPathComponent p#))
-					       nil)
-				   ~old-path (if-let [p# (.getOldLeadSelectionPath e#)]
-					       (path (.getLastPathComponent p#))
-					       nil)]
-				 ~@code)))))])
-    ~@(auto-setters JTree *tree-known-keys* opts)))))
+(defmacro tree [& {[[old-path new-path] & code] :action n :name :as opts }]
+  (let [n (or n (gensym "tree"))]
+    `(scroll-panel
+      (let [~n (new JTree)]
+	(doto ~n
+	  ~@(if code
+	      [`(.addTreeSelectionListener
+		 (proxy [TreeSelectionListener] []
+		   (valueChanged [e#]
+				 (do-swing
+				  (let [~new-path (if-let [p# (.getNewLeadSelectionPath e#)]
+						    (path (.getLastPathComponent p#))
+						    nil)
+					~old-path (if-let [p# (.getOldLeadSelectionPath e#)]
+						    (path (.getLastPathComponent p#))
+						    nil)]
+				    ~@code)))))])
+	  ~@(auto-setters JTree *tree-known-keys* opts))))))
