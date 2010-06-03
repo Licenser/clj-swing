@@ -1,6 +1,7 @@
 (ns clj-swing.tree
   (:use [clj-swing.core :only [add-action-listener icon-setters auto-setters]]
-	[clj-swing panel])
+	[clj-swing panel]
+	clojure.set)
   (:use [clojure.contrib.swing-utils :only [do-swing]])
   (:import (javax.swing JTree)
 	   (javax.swing.event TreeSelectionListener TreeSelectionEvent TreeModelEvent)
@@ -58,10 +59,9 @@
 		      (node-wrapper chi (conj (path node) chi))))
 	  (getChildCount [node]
 			 (count (keys (get-in @map-ref (path node)))))
-	  (getIndexOfChild [node chi]
-			   (let [c (str chi)
-				 ks (keys (get-in @map-ref (path node)))]
-			     (index-of ks c)))
+	  (getIndexOfChild [n chi]
+			   (let [ks (keys (get-in @map-ref (path n)))]
+			     (index-of ks (node chi))))
 	  (getRoot [] 
 		   root)
 	  (isLeaf [node]
@@ -73,18 +73,30 @@
 	    (alter map-ref update-in (.getLastPathComponent path) (constantly value)))))]
     (add-watch map-ref (gensym)
 	       (fn [k r o n]
-		 (let [c (changed-path o n)
-		       p (loop [ps [] c c]
-			   (if (empty? c)
-			     (reverse (conj ps root))
-			     (recur (conj ps (node-wrapper (last c) (vec c))) (butlast c))))
-		       _ (prn 1 p (map path p))
-		       tp (TreePath. (to-array p))
-		       _ (prn 2 tp)
-		       e (TreeModelEvent. model tp)]
-		   (doseq [l @listeners]
-		     (prn l)
-		     (.treeStructureChanged l e)))))
+		 (do-swing
+		  (let [c (changed-path n o)
+			k-n (set (keys (get-in n c)))
+			k-o (set (keys (get-in o c)))
+			only-n (difference k-n k-o)
+			only-o (difference k-o k-n)
+			_ (prn 1 only-n only-o)
+			node-changed (and 
+				      (= 1 (count only-n) (count only-o))
+				      (= (get-in n (concat c only-n))
+					 (get-in o (concat c only-o))))
+;			c (if node-changed (concat c only-n) c)
+			p (loop [ps [] c c]
+			    (if (empty? c)
+			      (reverse (conj ps root))
+			      (recur (conj ps (node-wrapper (last c) (vec c))) (butlast c))))
+			tp (TreePath. (to-array p))
+			e (TreeModelEvent. model tp)]
+		    (doseq [l @listeners]
+		      (if node-changed
+			(do
+			  (.treeStructureChanged l e)
+			  )
+			(.treeStructureChanged l e)))))))
     model))
 
 (defmacro tree [& {[[old-path new-path] & code] :action n :name :as opts }]
@@ -105,3 +117,6 @@
 						    nil)]
 				    ~@code)))))])
 	  ~@(auto-setters JTree *tree-known-keys* opts))))))
+
+{{:name "Netmask", :good true} "255.255.255.240", {:name "Network", :good true} "10.64.130.176", {:name "Router", :good false, :data {:SubnetMask "255.255.255.240", :SubnetIpAddress "10.64.130.176", :SubnetName "DMZ_ctrl(Cho)", :SubnetTypeName "DMZ_ctrl"}, :matcher :IpAddress, :cause true, :leaf true} nil}
+{{:good true, :name "Router"} "123", {:name "Netmask", :good true} "255.255.255.240", {:name "Network", :good true} "10.64.130.176"}

@@ -4,7 +4,8 @@
 (import '(javax.swing  UIManager)
 	'(java.awt BasicStroke Color Dimension Graphics Graphics2D RenderingHints)
 	'(java.awt.geom AffineTransform Ellipse2D)
-	'(java.awt GridBagLayout GridLayout GridBagConstraints))
+	'(java.awt GridBagLayout GridLayout GridBagConstraints)
+	clj-swing.tree.Pathed)
 
 (def sr (ref '["Quick sort" "Bubble Sort"]))
 (def lm (ref '["Bla" "Blubb"]))
@@ -16,7 +17,6 @@
 (. UIManager setLookAndFeel nativeLF)
 
 (defn paint-donut [g]
-  (println "y!!!o")
   (let [width 360
 	height 310
 	ellipse (new java.awt.geom.Ellipse2D$Double 0 0 80 130)
@@ -58,7 +58,7 @@
 
 (defn tree-example []
   (let [sr (ref "")
-	m (ref {"Cookies" {"Chocolat" 1 "Vanilla" { "with sparkles" 2 "without sparkles" 3}}})
+	m (ref {{:name "Cookies"} {{:name "Chocolat"} 1 {:name "Vanilla"} { {:name "with sparkles"} 2 {:name "without sparkles"} 3}}})
 	path (atom nil)]
   (frame :title "Tree example" :show true :size [400 200]
 	 [_ (stack
@@ -70,17 +70,20 @@
 			    (if new
 			      (dosync
 			       (swap! path (constantly new))
-			       (alter sr (constantly (last new))))))
-		 :model (mapref-tree-model m "Food"))]
+			       (alter sr (constantly (:name (last new)))))))
+		 :model (mapref-tree-model m {:name "Food"}
+					   :node-wrapper (fn [node path] (Pathed. node (str (:name node)) path))))]
 	     (add-action-listener
 	      tf
 	      ([_]
 		 (dosync
 		  (let [c (get-in @m @path)]
-		    (if-let [r (butlast @path)]		    
+		    (prn 10 c @sr @m)
+		    (if-let [r (butlast @path)]
 		      (do
-			(alter m update-in r #(dissoc % (last @path)))
-			(alter m update-in r #(assoc % @sr (last @path))))
+			(alter m update-in r dissoc (last @path))
+			(alter m update-in r assoc {:name @sr} c))
 		      (do
 			(alter m dissoc (last @path))
-			(alter m assoc  @sr c))))))))])))
+			(alter m assoc {:name @sr} c)))))
+		 (prn @m))))])))
