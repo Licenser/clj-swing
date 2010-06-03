@@ -1,8 +1,8 @@
 (ns clj-swing.panel
   (:use [clj-swing.core :only [group-container-args auto-setters icon-setters]])
-
-  (:import (javax.swing JPanel JScrollPane JSplitPane)
-	   (java.awt Dimension))
+  (:use [clojure.contrib.swing-utils :only [do-swing]])
+  (:import (javax.swing Box BoxLayout JPanel JScrollPane JSplitPane)
+	   (java.awt Dimension Component GridLayout FlowLayout))
   (:require [clojure.contrib.java-utils :as java]))
 
 
@@ -74,6 +74,32 @@
   `(JSplitPane. JSplitPane/VERTICAL_SPLIT
 	       ~top ~bottom))
 
+
+; Idea from joy of clojure
+
+(defmacro shelf [[& bindings] & body]
+  (let [pan (gensym "stack")]
+    `(let [~pan (doto (JPanel.) (.setLayout (FlowLayout.))) 
+	   ~@(reduce
+	     (fn [l [f s]]
+	       (concat l 
+		       (list f s)
+		       (list '_ `(.add ~pan (doto ~f (.setAlignmentX Component/CENTER_ALIGNMENT))))))
+	     '() (partition 2 bindings))]
+       ~@body
+       ~pan)))
+
+(defmacro stack [[& bindings] & body]
+  (let [st (gensym "stack")]
+    `(let [~st (Box. BoxLayout/PAGE_AXIS)
+	   ~@(reduce
+	     (fn [l [f s]]
+	       (concat l 
+		       (list f s)
+		       (list '_ `(.add ~st (doto ~f (.setAlignmentX Component/CENTER_ALIGNMENT))))))
+	     '() (partition 2 bindings))]
+       ~@body
+       ~st)))
 
 (defmacro scroll-panel [obj & { :as opts}]
   `(doto (new JScrollPane ~obj)
