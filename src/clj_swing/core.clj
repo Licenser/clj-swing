@@ -55,13 +55,18 @@
 (defn drop-nth [seq idx]
   (concat (take idx seq) (drop (inc idx) seq)))
 
-(defmacro add-action-listener [obj [[event] & code]]
+(defmacro add-listener [obj add-fn listener-class & events]
   `(doto ~obj
-     (.addActionListener
-      (proxy [ActionListener] []
+     (~add-fn
+      (proxy [~listener-class] []
+	~@events))))
+
+(defmacro add-action-listener [obj [[event] & code]]
+  `(add-listener ~obj .addActionListener ActionListener
 	(actionPerformed [~event]
-			 (do-swing 
-			 ~@code))))))
+			  ~@code)))
+
+
 (defn <3 [love & loves] 
   (loop [l (str "I love " love) loves loves]
     (let [[love & loves] loves]

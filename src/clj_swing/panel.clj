@@ -79,12 +79,12 @@
 
 (defmacro shelf [[& bindings] & body]
   (let [pan (gensym "stack")]
-    `(let [~pan (doto (JPanel.) (.setLayout (FlowLayout.))) 
+    `(let [~pan (doto (new JPanel) (.setLayout (FlowLayout.))) 
 	   ~@(reduce
 	     (fn [l [f s]]
 	       (concat l 
-		       (list f s)
-		       (list '_ `(.add ~pan ~f))))
+		       (list f s
+			     '_ `(.add ~pan ~f))))
 	     '() (partition 2 bindings))]
        ~@body
        ~pan)))

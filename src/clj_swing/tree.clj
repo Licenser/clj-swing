@@ -1,5 +1,5 @@
 (ns clj-swing.tree
-  (:use [clj-swing.core :only [add-action-listener icon-setters auto-setters]]
+  (:use [clj-swing.core :only [add-action-listener add-listener icon-setters auto-setters]]
 	[clj-swing panel]
 	clojure.set)
   (:use [clojure.contrib.swing-utils :only [do-swing]])
@@ -105,8 +105,7 @@
       (let [~n (new JTree)]
 	(doto ~n
 	  ~@(if code
-	      [`(.addTreeSelectionListener
-		 (proxy [TreeSelectionListener] []
+	      [`(add-listener .addTreeSelectionListener TreeSelectionListener
 		   (valueChanged [e#]
 				 (do-swing
 				  (let [~new-path (if-let [p# (.getNewLeadSelectionPath e#)]
@@ -115,7 +114,7 @@
 					~old-path (if-let [p# (.getOldLeadSelectionPath e#)]
 						    (path (.getLastPathComponent p#))
 						    nil)]
-				    ~@code)))))])
+				    ~@code))))])
 	  ~@(auto-setters JTree *tree-known-keys* opts))))))
 
 {{:name "Netmask", :good true} "255.255.255.240", {:name "Network", :good true} "10.64.130.176", {:name "Router", :good false, :data {:SubnetMask "255.255.255.240", :SubnetIpAddress "10.64.130.176", :SubnetName "DMZ_ctrl(Cho)", :SubnetTypeName "DMZ_ctrl"}, :matcher :IpAddress, :cause true, :leaf true} nil}
