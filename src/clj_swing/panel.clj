@@ -84,7 +84,7 @@
 	     (fn [l [f s]]
 	       (concat l 
 		       (list f s)
-		       (list '_ `(.add ~pan (doto ~f (.setAlignmentX Component/CENTER_ALIGNMENT))))))
+		       (list '_ `(.add ~pan ~f))))
 	     '() (partition 2 bindings))]
        ~@body
        ~pan)))

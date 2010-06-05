@@ -1,14 +1,14 @@
 # clj-swing
 
-clj-swing is supposed to be a easy way to create swing gui's in clojure.
+clj-swing is supposed to be an easy way to create swing GUIs in clojure.
 
 ## Usage
 
 Genreal guidelines:
- * classes can be configured during creation time. If a java class has a setter setHorizontalAlignment the attirubte can be given to the constructor as :horizontal-alignment.
- * if a class has fields for a setter, the fild name can be given in lower case letters so (label ... :horizontal-alignment :left) on a JLabel is equivalent to: (.setHorizontalAlignment label (JLabel/LEFT))
- * the form macro works as a kind of let with an implict doto so you can write (form <configuration> [c1 (component1) c2 (component2 doing something with 1)] the componeents will be inserted in this order.
- * The form macro also takes optinoal constrains for each component (this is an idea I took from Stuart Sierras blog post http://stuartsierra.com/2010/01/05/taming-the-gridbaglayout thousand thanks here!) They can but do not have to be added, if they are you need to add the :constraints optin holding the constrains object.
+ * classes can be configured during creation time. If a java class has a setter setHorizontalAlignment the attribute can be given to the constructor as :horizontal-alignment.
+ * if a class has fields for a setter, the field name can be given in lower case letters so (label ... :horizontal-alignment :left) on a JLabel is equivalent to: (.setHorizontalAlignment label (JLabel/LEFT))
+ * the form macro works as a kind of let with an implicit doto so you can write (form <configuration> [c1 (component1) c2 (component2 doing something with 1)] the components will be inserted in this order.
+ * The form macro also takes optional constraints for each component (this is an idea I took from Stuart Sierras blog post http://stuartsierra.com/2010/01/05/taming-the-gridbaglayout thousand thanks here!) They can but do not have to be added, if they are you need to add the :constraints optin holding the constraints object.
 
 ## Installation
 

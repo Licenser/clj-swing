@@ -63,6 +63,7 @@
   (frame :title "Tree example" :show true :size [400 200]
 	 [_ (stack
 	     [tf (text-field :str-ref sr)
+	      _ (shelf [_ (label "a") _ (label "b")])
 	      _ (tree
 		 :name tr
 		 :action ([old new]
