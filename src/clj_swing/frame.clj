@@ -19,7 +19,7 @@
 
 
 (def *frame-known-keys*
-     [:name :icon :title :layout :constrains :on-close :size :bounds :location :pack :show :centered])
+     [:name :icon :title :layout :constrains :on-close :size :bounds :location :pack :show :centered :menubar])
 
 (defmacro frame [& args]
   "options are:
@@ -75,6 +75,8 @@
 		[`(.setBounds ~x ~y ~w ~h)])
 	    ~@(when-let [[x y] (:location opts)]
 		[`(.setLocation ~x ~y)])
+	    ~@(when-let [menubar (:menubar opts)]
+		[`(.setJMenuBar ~menubar)])
 	    ~@(if (contains? opts :centered)
 		[`(.setLocationRelativeTo ~(:centered opts))])
 	    
