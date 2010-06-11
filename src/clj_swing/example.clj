@@ -4,7 +4,7 @@
 (import '(javax.swing  UIManager)
 	'(java.awt BasicStroke Color Dimension Graphics Graphics2D RenderingHints)
 	'(java.awt.geom AffineTransform Ellipse2D)
-	'(java.awt GridBagLayout GridLayout GridBagConstraints)
+	'(java.awt GridBagLayout FlowLayout GridLayout GridBagConstraints)
 	clj-swing.tree.Pathed)
 
 (def sr (ref '["Quick sort" "Bubble Sort"]))
@@ -55,6 +55,16 @@
 		   _ (text-field :str-ref str-ref :columns 10)
 		   :gridx 3 :gridy 0 :gridheight 3 :anchor :CENTER
 		   _ (scroll-panel (jlist :model (seq-ref-list-model lm)) :preferred-size [150 100])]))
+
+(defn button-example []
+  (frame :title "A Button Example"
+	 :layout (FlowLayout.)
+	 :size [220 90]
+	 :show true
+	 [b1 (button "First")
+	  b2 (button "Second")
+	  lab (label "Press a button")]
+	 (add-action-listener b1 ([e] (println "listener called")))))
 
 (defn tree-example []
   (let [sr (ref "")

@@ -76,11 +76,10 @@
 	    ~@(when-let [[x y] (:location opts)]
 		[`(.setLocation ~x ~y)])
 	    ~@(if (contains? opts :centered)
-		[`(.setLocationRelativeTo ~(:centered opts))])
-	    
+		[`(.setLocationRelativeTo ~(:centered opts))]))
 	    ~@forms
-	    
-	    ~@(if (:pack opts)
-		[`(.pack)])
-	    ~@(if (:show opts)
-		[`(.setVisible true)]))))))
+	    (doto ~frame
+	      ~@(if (:pack opts)
+		  [`(.pack)])
+	      ~@(if (:show opts)
+		  [`(.setVisible true)]))))))
