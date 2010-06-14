@@ -7,6 +7,8 @@
 	'(java.awt GridBagLayout FlowLayout GridLayout GridBagConstraints)
 	clj-swing.tree.Pathed)
 
+(:use 'clojure.contrib.swing-utils)
+
 (def sr (ref '["Quick sort" "Bubble Sort"]))
 (def lm (ref '["Bla" "Blubb"]))
 (def str-ref (ref "A String!"))
@@ -97,3 +99,31 @@
 			(alter m dissoc (last @path))
 			(alter m assoc {:name @sr} c)))))
 		 (prn @m))))])))
+
+(defn menu-example []
+  (let [search-str (ref "")
+	open-action (clojure.contrib.swing-utils/make-action
+		     {:name       "Open..."
+		      :mnemonic   KeyEvent/VK_O
+		      :long-desc  "Open a logfile"
+		      :short-desc "Open a logfile"
+		      :handler (fn [x] (println "Open-action"))})
+	quit-action (clojure.contrib.swing-utils/make-action
+		     {:name       "Close"
+		      :mnemonic   KeyEvent/VK_Q
+		      :long-desc  "Close the application"
+		      :short-desc "Close"
+		      :handler    (fn [_] (println "Quit-action"))})
+	menubar-spec [{:name      "File"
+		       :mnemonic   KeyEvent/VK_F
+		       :items [{:action open-action}
+			       {}
+			       {:action quit-action}]}
+		      {:name       "Help"
+		       :mnemonic  KeyEvent/VK_H
+		       :items []}]
+	menubar (clojure.contrib.swing-utils/make-menubar menubar-spec)]
+    (frame :title "Menu example"
+	   :menubar menubar
+	   :show true
+	   :pack true)))
