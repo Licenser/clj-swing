@@ -87,12 +87,14 @@
      
 
 
-(defmacro combo-box [[& items] & {action :action :as opts}]
-  `(doto (JComboBox.)
-     ~@(if action  
-	 [`(add-action-listener ~action)])
-     ~@(auto-setters JComboBox *cb-known-keys* opts)
-     ~@(map #(list '.addItem %) items)))
+(defmacro combo-box [items & {action :action :as opts}]
+  `(let [cb# (JComboBox.)]
+     (doto cb#
+       ~@(if action  
+	   [`(add-action-listener ~action)])
+       ~@(auto-setters JComboBox *cb-known-keys* opts))
+     (doseq [item# ~items] (.addItem cb# item#))
+     cb#))
 
 (defn selected-item [obj]
   (.getSelectedItem obj))

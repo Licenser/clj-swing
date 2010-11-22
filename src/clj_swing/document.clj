@@ -36,10 +36,8 @@
       (getChars [where len txt]
 		(let [s (max 0 (min where len))
 		      e (max 0 (min where len (.length @str-ref)))]
-		  (println "A:" @str-ref where len)
 		  (set! (. txt array) (into-array Character/TYPE (seq (subs @str-ref s e))))
-		  (println "B")
-		  (prn (seq (. txt array)))))
+		  ))
 
       (getString [where len]
 		 (let [s (max 0 (min where len))
@@ -88,7 +86,6 @@
 						(getElement[] elem) 
 						(getIndex[] 0)))
 			    
-			    
 			    (getDocument [] d)
 			    (getLength [] (.length state))
 			    (getOffset [] 0)
@@ -118,7 +115,6 @@
 	    (changedUpdate [event]))]
     (if (< 0 (.getLength doc))
       (.remove doc 0 (.getOffset (.getEndPosition doc))))
-    (prn str-ref)
     (.insertString doc 0 @str-ref nil)
     (.addDocumentListener doc l)
     (add-watch str-ref watch-key (watch-fn l))))

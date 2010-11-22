@@ -79,7 +79,6 @@
 			k-o (set (keys (get-in o c)))
 			only-n (difference k-n k-o)
 			only-o (difference k-o k-n)
-			_ (prn 1 only-n only-o)
 			node-changed (and 
 				      (= 1 (count only-n) (count only-o))
 				      (= (get-in n (concat c only-n))
@@ -116,6 +115,3 @@
 						    nil)]
 				    ~@code))))])
 	  ~@(auto-setters JTree *tree-known-keys* opts))))))
-
-{{:name "Netmask", :good true} "255.255.255.240", {:name "Network", :good true} "10.64.130.176", {:name "Router", :good false, :data {:SubnetMask "255.255.255.240", :SubnetIpAddress "10.64.130.176", :SubnetName "DMZ_ctrl(Cho)", :SubnetTypeName "DMZ_ctrl"}, :matcher :IpAddress, :cause true, :leaf true} nil}
-{{:good true, :name "Router"} "123", {:name "Netmask", :good true} "255.255.255.240", {:name "Network", :good true} "10.64.130.176"}
