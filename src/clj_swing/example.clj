@@ -5,6 +5,7 @@
 	'(java.awt BasicStroke Color Dimension Graphics Graphics2D RenderingHints)
 	'(java.awt.geom AffineTransform Ellipse2D)
 	'(java.awt GridBagLayout FlowLayout GridLayout GridBagConstraints)
+	'(java.awt.event KeyEvent)
 	clj-swing.tree.Pathed)
 
 (:use 'clojure.contrib.swing-utils)
